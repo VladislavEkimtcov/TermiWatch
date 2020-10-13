@@ -3,11 +3,13 @@
 Terminal Watch Face for Apple Watch.
 Based off [kuglee's termiwatch](https://github.com/kuglee/TermiWatch)
 
-![44 mm](https://i.imgur.com/jFZm4sB.jpg)
+<img src="https://i.imgur.com/jFZm4sB.jpg" width="20%">
 
 Simulator
 
-![irl](https://imgur.com/6qI0pMv.jpg)
+<img src="https://imgur.com/6qI0pMv.jpg" width="40%">
+
+irl
 
 # Changes:
 * Changed layout slightly
