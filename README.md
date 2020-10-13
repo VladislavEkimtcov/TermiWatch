@@ -10,7 +10,7 @@ I swear it all works, simulator just doesn't have the right data
 * Changed layout slightly
 * Added local sunset/sunrise
 * Changed today's steps to today's walking distance
-* Added distance to home (hardcoded because I can) (changes to km when further than 10,000m)
+* Added distance to home (hardcoded because I can) (changes to km when further than 10,000m, also accounts for indoor gps error)
 * wanted to add loudness meter, but it takes forever to update from healthkit so whatever, it'll just be dead code forever
 
 # Installation
