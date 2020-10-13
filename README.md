@@ -4,7 +4,10 @@ Terminal Watch Face for Apple Watch.
 Based off [kuglee's termiwatch](https://github.com/kuglee/TermiWatch)
 
 ![44 mm](https://i.imgur.com/jFZm4sB.jpg)
-I swear it all works, simulator just doesn't have the right data
+
+Simulator
+
+![irl](https://imgur.com/6qI0pMv.jpg)
 
 # Changes:
 * Changed layout slightly
