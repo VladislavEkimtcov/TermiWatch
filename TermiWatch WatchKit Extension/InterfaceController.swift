@@ -131,6 +131,7 @@ func activitySummaryAttributedString(
     color: ActivityRingColors.stand
   )
 
+
   let separatorString = NSAttributedString(string: separator)
 
   let attributedString = NSMutableAttributedString()
@@ -146,19 +147,28 @@ func activitySummaryAttributedString(
 // MARK: - Temperature styling
 
 let localizedTemperatureStyle: (MeasurementFormatter) -> Void = {
-  $0.locale = Locale(identifier: Locale.preferredLanguages.first!)
+  $0.locale = Locale(identifier: "de_DE")
   $0.numberFormatter.maximumFractionDigits = 0
   $0.unitStyle = .short
+}
+
+
+// MARK: - Distance styling
+let meterStyling: (NumberFormatter) -> Void = {
+    $0.locale = Locale(identifier: Locale.preferredLanguages.first!)
+    $0.usesSignificantDigits = false
+    $0.positiveFormat = "#,##0"
+    
 }
 
 // MARK: - Battery indicator
 
 func progressBarString(percent: UInt, steps: UInt) -> String? {
   let fillCount = Int((Float(steps) * (Float(percent) / 100.0)).rounded())
-  let full = String(repeating: "#", count: fillCount)
-  let empty = String(repeating: ".", count: Int(steps) - fillCount)
+  let full = String(repeating: "▓", count: fillCount)
+  let empty = String(repeating: "░", count: Int(steps) - fillCount)
 
-  return "[\(full + empty)]"
+  return "\(full + empty)"
 }
 
 func batteryIndicatorString(percent: UInt) -> String {
@@ -177,6 +187,10 @@ class InterfaceController: WKInterfaceController {
   @IBOutlet var stepsLabel: WKInterfaceLabel!
   @IBOutlet var heartRateLabel: WKInterfaceLabel!
   @IBOutlet var temperatureLabel: WKInterfaceLabel!
+  @IBOutlet var testLabel: WKInterfaceLabel!
+  @IBOutlet var tes2Label: WKInterfaceLabel!
+    
+    
 
   override func awake(withContext context: Any?) {
     super.awake(withContext: context)
@@ -201,6 +215,30 @@ class InterfaceController: WKInterfaceController {
       }
 
       TemperatureNotifier.shared.start()
+    }.catch {
+      print("Error:", $0)
+    }
+    
+    // MARK: - Base locator
+
+    firstly {
+      CLLocationManager.requestAuthorization()
+    }.done { _ in
+      let distFormatter = NumberFormatter()
+      meterStyling(distFormatter)
+
+      NotificationCenter.default.addObserver(
+        forName: LocationNotifier.LocationDidChange,
+        object: nil,
+        queue: nil
+      ) { [weak self] notification in
+        let dist = notification.object as! Measurement<UnitLength>
+        let txt = distFormatter.string(from: NSNumber(value: dist.value))! + " " + dist.unit.symbol
+        
+        self?.testLabel.setText(txt)
+      }
+
+        LocationNotifier.shared.start()
     }.catch {
       print("Error:", $0)
     }
@@ -244,28 +282,66 @@ class InterfaceController: WKInterfaceController {
           activitySummaryAttributedString($0)
         )
       }
-
+        
+        let distFormatter = NumberFormatter()
+        meterStyling(distFormatter)
       subscribeToStatisticsForToday(
         forQuantityType: HKQuantityType.quantityType(
-          forIdentifier: .stepCount
+          forIdentifier: .distanceWalkingRunning
         )!,
-        unit: HKUnit.count(),
+        unit: HKUnit.meter(),
         options: .cumulativeSum,
         healthStore: healthStore
       ) { [weak self] in
+        
+        let txt = distFormatter.string(from: NSNumber(value: $0))! + " m"
 
-        self?.stepsLabel.setText("\(Int($0)) steps")
+        self?.stepsLabel.setText(txt)
       }
 
       subscribeToQuantityType(
-        forSampleType: HKSampleType.quantityType(
-          forIdentifier: .heartRate
-        )!,
+        forSampleType: HKSampleType.quantityType(forIdentifier: .heartRate)!,
         unit: HKUnit(from: "count/min"),
         healthStore: healthStore
       ) { [weak self] in
         self?.heartRateLabel.setText("\(Int($0)) BPM")
       }
+        
+//        if #available(watchOSApplicationExtension 6.0, *) {
+//            subscribeToQuantityType(
+//                forSampleType: HKSampleType.quantityType(forIdentifier: .environmentalAudioExposure)!,
+//                unit: HKUnit.decibelAWeightedSoundPressureLevel(),
+//                healthStore: healthStore
+//            ) { [weak self] in
+//                self?.testLabel.setText("\(Int($0)) dBa")
+//            }
+//        } else {
+//            // Fallback on earlier versions
+//            print("nuts")
+//        }
+        
+        
+    }.catch {
+      print("Error:", $0)
+    }
+    
+    // MARK: - Sun Checker
+
+    firstly {
+      CLLocationManager.requestAuthorization()
+    }.done { _ in
+
+      NotificationCenter.default.addObserver(
+        forName: SunNotifier.SunDidChange,
+        object: nil,
+        queue: nil
+      ) { [weak self] notification in
+        let sunString = notification.object as! String
+
+        self?.tes2Label.setText(sunString)
+      }
+
+        SunNotifier.shared.start()
     }.catch {
       print("Error:", $0)
     }

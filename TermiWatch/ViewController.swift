@@ -11,7 +11,9 @@ let hkDataTypesOfInterest = Set([
   HKObjectType.quantityType(forIdentifier: .activeEnergyBurned)!,
   HKObjectType.quantityType(forIdentifier: .appleExerciseTime)!,
   HKObjectType.quantityType(forIdentifier: .heartRate)!,
-  HKObjectType.quantityType(forIdentifier: .stepCount)!,
+//  HKObjectType.quantityType(forIdentifier: .stepCount)!,
+  HKObjectType.quantityType(forIdentifier: .distanceWalkingRunning)!,
+  HKObjectType.quantityType(forIdentifier: .environmentalAudioExposure)!,
 ])
 
 class ViewController: UIViewController {
